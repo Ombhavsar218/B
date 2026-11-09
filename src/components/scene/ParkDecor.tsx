@@ -1,39 +1,10 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-
-function StorybookTree({
-  position,
-  canopyColor = '#F7C2D5',
-  scale = 1,
-}: {
-  position: [number, number, number];
-  canopyColor?: string;
-  scale?: number;
-}) {
-  return (
-    <group position={position} scale={scale}>
-      {/* Trunk */}
-      <mesh position={[0, 0.9, 0]} castShadow>
-        <cylinderGeometry args={[0.16, 0.26, 1.8, 10]} />
-        <meshStandardMaterial color="#B58E7D" roughness={0.85} />
-      </mesh>
-      {/* Layered Fluffy Blossom Canopy */}
-      <mesh position={[0, 2.35, 0]} castShadow>
-        <sphereGeometry args={[1.15, 16, 14]} />
-        <meshStandardMaterial color={canopyColor} roughness={0.68} />
-      </mesh>
-      <mesh position={[-0.68, 1.98, 0.35]} castShadow>
-        <sphereGeometry args={[0.78, 14, 12]} />
-        <meshStandardMaterial color={canopyColor} roughness={0.68} />
-      </mesh>
-      <mesh position={[0.68, 2.02, -0.3]} castShadow>
-        <sphereGeometry args={[0.82, 14, 12]} />
-        <meshStandardMaterial color={canopyColor} roughness={0.68} />
-      </mesh>
-    </group>
-  );
-}
+import { StorybookTree } from './SharedParkParts';
+import { Butterflies } from './Butterflies';
+import { KenneyModel } from './KenneyModel';
+import { getPBRTextureSet } from '../../utils/pbrMaterials';
 
 function ParkBench({
   position,
@@ -42,177 +13,33 @@ function ParkBench({
   position: [number, number, number];
   rotationY?: number;
 }) {
+  const wood = useMemo(() => getPBRTextureSet('oak_wood_planks', 2, 1), []);
+
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
-      {/* Seat */}
-      <mesh position={[0, 0.38, 0]} castShadow>
-        <boxGeometry args={[1.4, 0.08, 0.48]} />
-        <meshStandardMaterial color="#FFF6EC" roughness={0.65} />
+      <mesh position={[0, 0.38, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.6, 0.08, 0.5]} />
+        <meshStandardMaterial
+          map={wood.map}
+          normalMap={wood.normalMap}
+          color="#FFF1E2"
+          roughness={0.7}
+        />
       </mesh>
-      {/* Backrest */}
-      <mesh position={[0, 0.68, -0.2]} rotation={[-0.14, 0, 0]} castShadow>
-        <boxGeometry args={[1.4, 0.42, 0.07]} />
-        <meshStandardMaterial color="#F7D5E2" roughness={0.6} />
+      <mesh position={[0, 0.68, -0.21]} rotation={[-0.14, 0, 0]} castShadow>
+        <boxGeometry args={[1.6, 0.44, 0.07]} />
+        <meshStandardMaterial
+          map={wood.map}
+          normalMap={wood.normalMap}
+          color="#F7D5E2"
+          roughness={0.66}
+        />
       </mesh>
-      {/* Legs */}
-      {[-0.55, 0.55].map((lx) => (
+      {[-0.65, 0.65].map((lx) => (
         <mesh key={lx} position={[lx, 0.2, 0]} castShadow>
-          <boxGeometry args={[0.08, 0.38, 0.42]} />
-          <meshStandardMaterial color="#C89E5D" metalness={0.3} roughness={0.45} />
+          <boxGeometry args={[0.09, 0.38, 0.44]} />
+          <meshStandardMaterial color="#B58A4A" metalness={0.62} roughness={0.34} />
         </mesh>
-      ))}
-    </group>
-  );
-}
-
-function MemoryGazebo({
-  position = [11.2, 0, 2.5],
-  onSelect,
-}: {
-  position?: [number, number, number];
-  onSelect?: () => void;
-}) {
-  const columns = useMemo(
-    () =>
-      Array.from({ length: 6 }, (_, i) => {
-        const angle = (i / 6) * Math.PI * 2;
-        return [Math.cos(angle) * 2.2, 0, Math.sin(angle) * 2.2] as [number, number, number];
-      }),
-    []
-  );
-
-  return (
-    <group
-      position={position}
-      onClick={(e) => {
-        if (onSelect) {
-          e.stopPropagation();
-          onSelect();
-        }
-      }}
-    >
-      {/* Stepped Marble Gazebo Floor */}
-      <mesh position={[0, 0.1, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[2.9, 3.1, 0.2, 24]} />
-        <meshStandardMaterial color="#FFF6EC" roughness={0.72} />
-      </mesh>
-      <mesh position={[0, 0.24, 0]} receiveShadow>
-        <cylinderGeometry args={[2.55, 2.65, 0.12, 24]} />
-        <meshStandardMaterial color="#F6EAF9" roughness={0.68} />
-      </mesh>
-
-      {/* Six Fairytale Columns */}
-      {columns.map((pos, idx) => (
-        <mesh key={idx} position={[pos[0], 1.55, pos[2]]} castShadow>
-          <cylinderGeometry args={[0.1, 0.13, 2.6, 12]} />
-          <meshStandardMaterial color="#FFF9F2" roughness={0.6} />
-        </mesh>
-      ))}
-
-      {/* Decorative Ring Beam */}
-      <mesh position={[0, 2.86, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[2.22, 0.1, 10, 32]} />
-        <meshStandardMaterial color="#F6BE65" metalness={0.4} roughness={0.35} />
-      </mesh>
-
-      {/* Scalloped Sky-Blue & Lavender Gazebo Dome */}
-      <mesh position={[0, 3.65, 0]} castShadow>
-        <coneGeometry args={[2.75, 1.75, 12]} />
-        <meshStandardMaterial color="#BCE3FA" roughness={0.48} />
-      </mesh>
-      <mesh position={[0, 4.65, 0]}>
-        <sphereGeometry args={[0.18, 12, 12]} />
-        <meshStandardMaterial
-          color="#FFD98E"
-          emissive="#F6BE65"
-          emissiveIntensity={0.4}
-          metalness={0.45}
-        />
-      </mesh>
-
-      {/* Warm Central Hanging Lantern */}
-      <mesh position={[0, 2.55, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.65, 6]} />
-        <meshStandardMaterial color="#C89E5D" />
-      </mesh>
-      <mesh position={[0, 2.15, 0]}>
-        <sphereGeometry args={[0.24, 14, 14]} />
-        <meshStandardMaterial
-          color="#FFE8AF"
-          emissive="#FFD07B"
-          emissiveIntensity={0.9}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function CelebrationStage({
-  position = [10.0, 0, -8.0],
-  onSelect,
-}: {
-  position?: [number, number, number];
-  onSelect?: () => void;
-}) {
-  const posts = useMemo(
-    () =>
-      Array.from({ length: 6 }, (_, i) => {
-        const angle = (i / 6) * Math.PI * 2 + 0.3;
-        return {
-          x: Math.cos(angle) * 3.05,
-          z: Math.sin(angle) * 3.05,
-          color: ['#F7C6D9', '#D9CCF2', '#BCE3FA'][i % 3],
-        };
-      }),
-    []
-  );
-
-  return (
-    <group
-      position={position}
-      onClick={(e) => {
-        if (onSelect) {
-          e.stopPropagation();
-          onSelect();
-        }
-      }}
-    >
-      {/* Festive Circular Stage */}
-      <mesh position={[0, 0.14, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[3.35, 3.55, 0.28, 32]} />
-        <meshStandardMaterial color="#FFF3EB" roughness={0.68} />
-      </mesh>
-      <mesh position={[0, 0.29, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[2.3, 3.1, 32]} />
-        <meshStandardMaterial color="#FADAE6" roughness={0.65} />
-      </mesh>
-
-      {/* Center Pedestal Cushion (ready for Day 3 Birthday Cake!) */}
-      <mesh position={[0, 0.55, 0]} castShadow>
-        <cylinderGeometry args={[0.85, 0.98, 0.55, 24]} />
-        <meshStandardMaterial color="#FDF0F5" roughness={0.58} />
-      </mesh>
-      <mesh position={[0, 0.85, 0]}>
-        <torusGeometry args={[0.86, 0.05, 8, 28]} />
-        <meshStandardMaterial color="#F6BE65" metalness={0.45} roughness={0.3} />
-      </mesh>
-
-      {/* Decorative Stage Posts & Pastel Lanterns */}
-      {posts.map((post, idx) => (
-        <group key={idx} position={[post.x, 0.28, post.z]}>
-          <mesh position={[0, 1.15, 0]} castShadow>
-            <cylinderGeometry args={[0.06, 0.08, 2.3, 10]} />
-            <meshStandardMaterial color="#FFF6EC" roughness={0.6} />
-          </mesh>
-          <mesh position={[0, 2.36, 0]}>
-            <sphereGeometry args={[0.2, 12, 12]} />
-            <meshStandardMaterial
-              color={post.color}
-              emissive="#FFD98E"
-              emissiveIntensity={0.45}
-            />
-          </mesh>
-        </group>
       ))}
     </group>
   );
@@ -223,20 +50,21 @@ function DriftingClouds() {
 
   const clouds = useMemo(
     () => [
-      { pos: [-34, 8.5, -18] as [number, number, number], scale: 1.5 },
-      { pos: [34, 10.2, -16] as [number, number, number], scale: 1.7 },
-      { pos: [-32, 3.2, 14] as [number, number, number], scale: 1.3 },
-      { pos: [33, 4.5, 16] as [number, number, number], scale: 1.45 },
-      { pos: [0, 11.5, -34] as [number, number, number], scale: 2.0 },
-      { pos: [-18, -1.5, 29] as [number, number, number], scale: 1.2 },
-      { pos: [20, -1.2, 28] as [number, number, number], scale: 1.35 },
+      { pos: [-78, 16, -42] as [number, number, number], scale: 2.3 },
+      { pos: [78, 18, -36] as [number, number, number], scale: 2.5 },
+      { pos: [-82, 8, 22] as [number, number, number], scale: 2.0 },
+      { pos: [82, 10, 26] as [number, number, number], scale: 2.2 },
+      { pos: [-45, 22, -74] as [number, number, number], scale: 2.6 },
+      { pos: [45, 21, -74] as [number, number, number], scale: 2.5 },
+      { pos: [-50, -1.5, 62] as [number, number, number], scale: 1.8 },
+      { pos: [52, -1.2, 60] as [number, number, number], scale: 1.9 },
     ],
     []
   );
 
   useFrame((_, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.014;
+      groupRef.current.rotation.y += delta * 0.008;
     }
   });
 
@@ -245,15 +73,15 @@ function DriftingClouds() {
       {clouds.map((c, idx) => (
         <group key={idx} position={c.pos} scale={c.scale}>
           <mesh position={[0, 0, 0]}>
-            <sphereGeometry args={[1.8, 12, 10]} />
+            <sphereGeometry args={[2.1, 12, 10]} />
             <meshStandardMaterial color="#FFF9F4" roughness={0.95} />
           </mesh>
-          <mesh position={[-1.4, -0.35, 0.2]}>
-            <sphereGeometry args={[1.25, 12, 10]} />
+          <mesh position={[-1.6, -0.35, 0.2]}>
+            <sphereGeometry args={[1.45, 12, 10]} />
             <meshStandardMaterial color="#FFF4F8" roughness={0.95} />
           </mesh>
-          <mesh position={[1.45, -0.3, -0.15]}>
-            <sphereGeometry args={[1.35, 12, 10]} />
+          <mesh position={[1.65, -0.3, -0.15]}>
+            <sphereGeometry args={[1.55, 12, 10]} />
             <meshStandardMaterial color="#F6F1FF" roughness={0.95} />
           </mesh>
         </group>
@@ -262,86 +90,97 @@ function DriftingClouds() {
   );
 }
 
-export function ParkDecor({
-  onSelectMemories,
-  onSelectSurprises,
-}: {
-  onSelectMemories?: () => void;
-  onSelectSurprises?: () => void;
-}) {
-  const trees = useMemo(
+export function ParkDecor({ isDetailed = true }: { isDetailed?: boolean }) {
+  const blossomTrees = useMemo(
     () => [
-      // Framing behind and beside the Castle
-      { pos: [-11.5, 0, -14.5] as [number, number, number], color: '#F7C2D5', scale: 1.15 },
-      { pos: [-15.2, 0, -10.0] as [number, number, number], color: '#D8C6F3', scale: 1.05 },
-      { pos: [11.5, 0, -15.5] as [number, number, number], color: '#F7C2D5', scale: 1.1 },
-      { pos: [-6.5, 0, -19.0] as [number, number, number], color: '#D8C6F3', scale: 1.2 },
-      { pos: [6.5, 0, -19.0] as [number, number, number], color: '#FAD5E4', scale: 1.2 },
-      // West Tulip Garden Perimeter
-      { pos: [-19.2, 0, 3.2] as [number, number, number], color: '#FAD5E4', scale: 1.1 },
-      { pos: [-17.5, 0, 9.8] as [number, number, number], color: '#9FD3A8', scale: 1.0 },
-      { pos: [-13.0, 0, 14.5] as [number, number, number], color: '#F7C2D5', scale: 0.95 },
-      // East Memory Pavilion Perimeter
-      { pos: [17.8, 0, 6.2] as [number, number, number], color: '#D8C6F3', scale: 1.1 },
-      { pos: [17.2, 0, -2.5] as [number, number, number], color: '#9FD3A8', scale: 1.0 },
-      { pos: [14.5, 0, 12.8] as [number, number, number], color: '#FAD5E4', scale: 1.0 },
-      // South Entrance Framing
-      { pos: [-7.5, 0, 17.8] as [number, number, number], color: '#9FD3A8', scale: 1.05 },
-      { pos: [7.5, 0, 17.8] as [number, number, number], color: '#F7C2D5', scale: 1.05 },
-      { pos: [16.5, 0, -12.5] as [number, number, number], color: '#D8C6F3', scale: 1.05 },
+      { pos: [-7.5, 0, 32] as [number, number, number], color: '#F7C2D5', scale: 1.25 },
+      { pos: [7.5, 0, 32] as [number, number, number], color: '#D8C6F3', scale: 1.2 },
+      { pos: [8.5, 0, 22] as [number, number, number], color: '#FAD5E4', scale: 1.18 },
+      { pos: [-11.5, 0, 12] as [number, number, number], color: '#F7C2D5', scale: 1.1 },
+      { pos: [11.5, 0, 11] as [number, number, number], color: '#D8C6F3', scale: 1.12 },
+      { pos: [12.5, 0, -4] as [number, number, number], color: '#FAD5E4', scale: 1.15 },
+      { pos: [-64, 0, -8] as [number, number, number], color: '#D8C6F3', scale: 1.35 },
+      { pos: [24, 0, -58] as [number, number, number], color: '#F7C2D5', scale: 1.3 },
+    ],
+    []
+  );
+
+  // Realistic CC0 Kenney Forest & Oak Trees placed seamlessly alongside Storybooks
+  const realisticTrees = useMemo(
+    () => [
+      { url: '/models/tree_detailed.glb', pos: [-8.5, 0, 22] as [number, number, number], scale: 3.4, rot: 0.4 },
+      { url: '/models/tree_oak.glb', pos: [-12.5, 0, -4] as [number, number, number], scale: 3.6, rot: 1.2 },
+      { url: '/models/tree_detailed.glb', pos: [-26, 0, 36] as [number, number, number], scale: 4.1, rot: 2.1 },
+      { url: '/models/tree_oak.glb', pos: [26, 0, 42] as [number, number, number], scale: 4.0, rot: 0.9 },
+      { url: '/models/tree_detailed.glb', pos: [66, 0, 12] as [number, number, number], scale: 4.1, rot: 1.7 },
+      { url: '/models/tree_oak.glb', pos: [-24, 0, -58] as [number, number, number], scale: 3.8, rot: 2.8 },
+      { url: '/models/tree_detailed.glb', pos: [-16, 0, 40] as [number, number, number], scale: 3.7, rot: 0.3 },
+      { url: '/models/tree_oak.glb', pos: [16, 0, 40] as [number, number, number], scale: 3.7, rot: 2.5 },
     ],
     []
   );
 
   const topiaries: [number, number, number][] = useMemo(
     () => [
-      [-4.6, 0, 6.2],
-      [4.6, 0, 6.2],
-      [-5.2, 0, -1.6],
-      [5.2, 0, -1.6],
-      [-3.5, 0, 19.6],
-      [3.5, 0, 19.6],
+      [-5.4, 0, 11.2],
+      [5.4, 0, 11.2],
+      [-5.4, 0, 0.8],
+      [5.4, 0, 0.8],
+      [-4.2, 0, 36.5],
+      [4.2, 0, 36.5],
+      [-10.2, 0, 6.0],
+      [10.2, 0, 6.0],
     ],
     []
   );
 
   return (
     <group>
-      {/* Storybook Blossom & Meadow Trees */}
-      {trees.map((tree, idx) => (
+      {/* Storybook Blossom Trees with Gentle Breeze Motion */}
+      {blossomTrees.map((tree, idx) => (
         <StorybookTree
           key={idx}
           position={tree.pos}
           canopyColor={tree.color}
           scale={tree.scale}
+          swayOffset={idx * 0.7}
         />
       ))}
 
-      {/* Manicured Topiary Hedges */}
+      {/* Realistic CC0 Oak & Forest Trees */}
+      {realisticTrees.map((tree, idx) => (
+        <KenneyModel
+          key={`kt-${idx}`}
+          url={tree.url}
+          position={tree.pos}
+          rotation={[0, tree.rot, 0]}
+          scale={tree.scale}
+          tintColor="#B7E2B8"
+        />
+      ))}
+
+      {/* Manicured Topiary Shrubs + Natural Kenney Flower Bushes */}
       {topiaries.map((pos, idx) => (
         <group key={idx} position={pos}>
-          <mesh position={[0, 0.48, 0]} castShadow>
-            <sphereGeometry args={[0.55, 14, 12]} />
-            <meshStandardMaterial color="#8BC692" roughness={0.8} />
-          </mesh>
-          <mesh position={[0, 1.02, 0]}>
-            <sphereGeometry args={[0.28, 12, 10]} />
-            <meshStandardMaterial color="#A3D9A8" roughness={0.78} />
-          </mesh>
+          <KenneyModel url="/models/plant_bushDetailed.glb" scale={2.4} tintColor="#9AD9A2" />
+          <KenneyModel
+            url={idx % 2 === 0 ? '/models/flower_purpleA.glb' : '/models/flower_redA.glb'}
+            position={[0.45, 0, 0.35]}
+            scale={1.8}
+          />
         </group>
       ))}
 
-      {/* Wishing Plaza Benches */}
-      <ParkBench position={[-3.9, 0.07, 4.1]} rotationY={2.35} />
-      <ParkBench position={[3.9, 0.07, 4.1]} rotationY={-2.35} />
+      {/* Wishing Plaza Oak & Gold Benches */}
+      <ParkBench position={[-5.2, 0.09, 8.6]} rotationY={2.35} />
+      <ParkBench position={[5.2, 0.09, 8.6]} rotationY={-2.35} />
+      <ParkBench position={[-5.2, 0.09, 3.4]} rotationY={0.78} />
+      <ParkBench position={[5.2, 0.09, 3.4]} rotationY={-0.78} />
 
-      {/* Memory Pavilion Gazebo */}
-      <MemoryGazebo onSelect={onSelectMemories} />
+      {/* Promenade & Plaza Butterflies */}
+      {isDetailed && <Butterflies areaCenter={[0, 2.1, 14]} count={8} spread={8} />}
 
-      {/* Celebration Lawn Stage */}
-      <CelebrationStage onSelect={onSelectSurprises} />
-
-      {/* Soft Floating Clouds */}
+      {/* Soft Distant Drifting Clouds */}
       <DriftingClouds />
     </group>
   );

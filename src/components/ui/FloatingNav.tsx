@@ -1,7 +1,16 @@
-import { Home, Map, Flower2, Castle, Heart, Gift, Compass } from 'lucide-react';
-import type { DestinationConfig } from '../../config/birthdayConfig';
-
-export type ParkDestinationId = DestinationConfig['id'];
+import {
+  Home,
+  Map,
+  Flower2,
+  Castle,
+  Heart,
+  Cake,
+  Compass,
+  Snowflake,
+  Palmtree,
+  Orbit,
+} from 'lucide-react';
+import type { ParkDestinationId } from '../../config/birthdayConfig';
 
 interface FloatingNavProps {
   visible: boolean;
@@ -18,10 +27,13 @@ const NAV_ITEMS: Array<{
 }> = [
   { id: 'intro', label: 'Home', icon: Home },
   { id: 'map', label: 'Park Map', icon: Map },
+  { id: 'frozen-kingdom', label: 'Frozen', icon: Snowflake },
+  { id: 'fantasyland', label: 'Fantasy', icon: Castle },
   { id: 'tulip-garden', label: 'Tulip Garden', icon: Flower2 },
-  { id: 'fantasyland', label: 'Fantasyland', icon: Castle },
+  { id: 'adventure-kingdom', label: 'Adventure', icon: Palmtree },
+  { id: 'galaxy-kingdom', label: 'Galaxy', icon: Orbit },
+  { id: 'surprises', label: 'Celebration', icon: Cake },
   { id: 'memories', label: 'Memories', icon: Heart },
-  { id: 'surprises', label: 'Birthday Surprises', icon: Gift },
 ];
 
 export function FloatingNav({
@@ -48,17 +60,16 @@ export function FloatingNav({
           title="Return to Main Park Overview"
         >
           <Compass className="h-4 w-4 text-[#D99B38]" />
-          <span className="hidden sm:inline">Main Park</span>
-          <span className="sm:hidden">Overview</span>
+          <span>Main Park</span>
         </button>
       </div>
 
       {/* Bottom Floating Navigation Dock */}
       <nav
         aria-label="Park Navigation"
-        className="pointer-events-auto fixed inset-x-0 bottom-4 z-20 flex justify-center px-3"
+        className="pointer-events-auto fixed inset-x-0 bottom-3 z-20 flex justify-center px-2 sm:bottom-4 sm:px-3"
       >
-        <div className="storybook-pill flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1.5 shadow-lg">
+        <div className="storybook-pill no-scrollbar flex max-w-full items-center gap-1 overflow-x-auto rounded-full p-1.5 shadow-lg">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -77,7 +88,7 @@ export function FloatingNav({
                     onSelectDestination(item.id);
                   }
                 }}
-                className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition-all duration-200 sm:text-[13px] ${
+                className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-all duration-200 sm:px-3.5 sm:text-[13px] ${
                   isActive
                     ? 'bg-gradient-to-r from-[#F7C6D9]/85 via-[#FFF2DC] to-[#D9CCF2]/85 text-[#3B2B4B] shadow-sm ring-1 ring-[#E2B362]/65'
                     : 'text-[#5A4570] hover:bg-white/60 hover:text-[#3B2B4B]'

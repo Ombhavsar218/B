@@ -88,3 +88,12 @@
 .animate-soft-twinkle {
   animation: soft-twinkle 3.2s ease-in-out infinite;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

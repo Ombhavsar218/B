@@ -12,9 +12,9 @@ export function MagicalAtmosphere() {
   const petalGeometry = useMemo(() => {
     const shape = new THREE.Shape();
     shape.moveTo(0, 0);
-    shape.quadraticCurveTo(0.12, 0.14, 0.06, 0.3);
-    shape.quadraticCurveTo(0, 0.36, -0.06, 0.3);
-    shape.quadraticCurveTo(-0.12, 0.14, 0, 0);
+    shape.quadraticCurveTo(0.14, 0.16, 0.07, 0.34);
+    shape.quadraticCurveTo(0, 0.41, -0.07, 0.34);
+    shape.quadraticCurveTo(-0.14, 0.16, 0, 0);
     return new THREE.ShapeGeometry(shape, 6);
   }, []);
 
@@ -25,14 +25,14 @@ export function MagicalAtmosphere() {
       return s / 4294967296;
     };
 
-    return Array.from({ length: 85 }, () => ({
-      x: (rand() - 0.5) * 34,
-      y: 1.5 + rand() * 14,
-      z: (rand() - 0.5) * 38,
-      speedY: 0.32 + rand() * 0.45,
-      swayAmp: 0.45 + rand() * 0.65,
+    return Array.from({ length: 120 }, () => ({
+      x: (rand() - 0.5) * 90,
+      y: 2.0 + rand() * 20,
+      z: (rand() - 0.5) * 85,
+      speedY: 0.35 + rand() * 0.45,
+      swayAmp: 0.55 + rand() * 0.75,
       phase: rand() * Math.PI * 2,
-      scale: 0.65 + rand() * 0.65,
+      scale: 0.7 + rand() * 0.7,
       color: new THREE.Color(PETAL_COLORS[Math.floor(rand() * PETAL_COLORS.length)]),
     }));
   }, []);
@@ -44,13 +44,13 @@ export function MagicalAtmosphere() {
       return s / 4294967296;
     };
 
-    return Array.from({ length: 70 }, () => ({
-      x: (rand() - 0.5) * 44,
-      y: 3.5 + rand() * 18,
-      z: -24 + rand() * 44,
+    return Array.from({ length: 120 }, () => ({
+      x: (rand() - 0.5) * 140,
+      y: 6.0 + rand() * 34,
+      z: -62 + rand() * 110,
       phase: rand() * Math.PI * 2,
       speed: 1.4 + rand() * 1.8,
-      baseScale: 0.08 + rand() * 0.12,
+      baseScale: 0.12 + rand() * 0.16,
     }));
   }, []);
 
@@ -76,8 +76,8 @@ export function MagicalAtmosphere() {
         varying vec3 vWorldPosition;
         void main() {
           float h = normalize(vWorldPosition).y;
-          vec3 col = mix(bottomColor, midColor, smoothstep(-0.08, 0.28, h));
-          col = mix(col, topColor, smoothstep(0.24, 0.78, h));
+          vec3 col = mix(bottomColor, midColor, smoothstep(-0.08, 0.25, h));
+          col = mix(col, topColor, smoothstep(0.22, 0.75, h));
           gl_FragColor = vec4(col, 1.0);
         }
       `,
@@ -103,8 +103,8 @@ export function MagicalAtmosphere() {
     if (petalsRef.current) {
       for (let i = 0; i < petalSeeds.length; i++) {
         const p = petalSeeds[i];
-        const yRange = 14;
-        const y = ((p.y - t * p.speedY) % yRange + yRange) % yRange + 0.8;
+        const yRange = 20;
+        const y = ((p.y - t * p.speedY) % yRange + yRange) % yRange + 1.0;
         const x = p.x + Math.sin(t * 0.8 + p.phase) * p.swayAmp;
         const z = p.z + Math.cos(t * 0.65 + p.phase) * p.swayAmp * 0.7;
 
@@ -125,7 +125,7 @@ export function MagicalAtmosphere() {
       for (let i = 0; i < starSeeds.length; i++) {
         const st = starSeeds[i];
         const twinkle = 0.55 + 0.45 * Math.sin(t * st.speed + st.phase);
-        dummy.position.set(st.x, st.y + Math.sin(t * 0.6 + st.phase) * 0.2, st.z);
+        dummy.position.set(st.x, st.y + Math.sin(t * 0.6 + st.phase) * 0.25, st.z);
         dummy.rotation.set(0, t * 0.8 + st.phase, Math.PI / 4);
         dummy.scale.setScalar(st.baseScale * twinkle);
         dummy.updateMatrix();
@@ -137,9 +137,9 @@ export function MagicalAtmosphere() {
 
   return (
     <group>
-      {/* Painterly Pastel Sky Dome */}
+      {/* Expanded Painterly Pastel Sky Dome */}
       <mesh>
-        <sphereGeometry args={[95, 24, 16]} />
+        <sphereGeometry args={[240, 28, 18]} />
         <shaderMaterial args={[skyShaderArgs]} />
       </mesh>
 
@@ -147,18 +147,16 @@ export function MagicalAtmosphere() {
       <instancedMesh
         ref={petalsRef}
         args={[petalGeometry, undefined, petalSeeds.length]}
+        frustumCulled={false}
       >
-        <meshStandardMaterial
-          color="#FFFFFF"
-          side={THREE.DoubleSide}
-          roughness={0.55}
-        />
+        <meshStandardMaterial color="#FFFFFF" side={THREE.DoubleSide} roughness={0.55} />
       </instancedMesh>
 
       {/* Sparkling Golden Stars */}
       <instancedMesh
         ref={starsRef}
         args={[undefined, undefined, starSeeds.length]}
+        frustumCulled={false}
       >
         <octahedronGeometry args={[1, 0]} />
         <meshStandardMaterial

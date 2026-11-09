@@ -58,9 +58,9 @@ export function DestinationMarker({
 
       {/* Subtle Floating Label Pill */}
       <Html
-        position={[0, 0.72, 0]}
+        position={[0, 0.9, 0]}
         center
-        distanceFactor={20}
+        distanceFactor={28}
         zIndexRange={[10, 0]}
       >
         <button
